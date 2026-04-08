@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Tool Predictor — Guided</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Konecta Brand Palette ── */
+  :root {
+    --bg:           #F4F6FB;
+    --bg2:          #EEF1F8;
+    --white:        #FFFFFF;
+    --ink:          #0D1B3E;
+    --ink2:         #3D4F72;
+    --ink3:         #6B7899;
+    --ink4:         #9AAABF;
+    --border:       #DDE3F0;
+    --border2:      #C8D2E8;
+    --accent:       #0057FF;
+    --accent-light: #E8F0FF;
+    --accent-mid:   #B3CBFF;
+    --navy:         #06152B;
+    --navy2:        #0A2257;
+    --green:        #00B87C;
+    --green-light:  #E6FAF4;
+    --green-mid:    #99E8D0;
+    --amber:        #D97706;
+    --amber-light:  #FFFBEB;
+    --amber-mid:    #FDE68A;
+    --red:          #E53939;
+    --red-light:    #FEF0F0;
+    --purple:       #6D28D9;
+    --purple-light: #F5F0FF;
+    --purple-mid:   #C4B5FD;
+    --teal:         #0891B2;
+    --teal-light:   #E0F7FB;
+    --teal-mid:     #A5F3FC;
+    --gold:         #B45309;
+    --silver:       #6B7899;
+    --bronze:       #92400E;
+    --r1-bg:        #FFFBEB; --r1-border: #FDE68A;
+    --r2-bg:        #F4F6FB; --r2-border: #DDE3F0;
+    --r3-bg:        #FFF7ED; --r3-border: #FED7AA;
+    --shadow:       0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.06);
+    --shadow-blue:  0 4px 16px rgba(0,87,255,.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: #1211E6;
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .brand-name { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
+
+  .step-pills-bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+  .step-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,.45);
+    cursor: pointer; transition: all .18s;
+    border: none; background: transparent;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .step-pill:hover { color: rgba(255,255,255,.8); background: rgba(255,255,255,.08); }
+  .step-pill.done { color: #6ee7b7; }
+  .step-pill.active { background: rgba(255,255,255,.12); color: #fff; }
+  .step-num {
+    width: 16px; height: 16px; border-radius: 4px;
+    background: rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: rgba(255,255,255,.5);
+    flex-shrink: 0;
+  }
+  .step-pill.active .step-num { background: rgba(255,255,255,.2); color: #fff; }
+  .step-pill.done .step-num { background: rgba(110,231,183,.2); color: #6ee7b7; }
+  .step-sep { color: rgba(255,255,255,.2); font-size: 12px; padding: 0 1px; user-select: none; }
+
+  .home-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .home-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.35); }
+
+  /* ── LAYOUT ── */
+  .page {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 56px - 64px);
+  }
+  @media (max-width: 860px) { .page { grid-template-columns: 1fr; } }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px - 64px);
+  }
+
+  .sidebar-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .sidebar-title::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* Selection summary */
+  .sel-summary { display: flex; flex-direction: column; gap: 5px; }
+  .sel-item {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 9px 11px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .sel-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .sel-item-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+    text-transform: uppercase; color: var(--ink3);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .edit-hint { font-size: 9px; color: var(--accent); font-weight: 600; text-transform: none; letter-spacing: 0; opacity: 0; transition: opacity .15s; }
+  .sel-item:hover .edit-hint { opacity: 1; }
+  .sel-item-val { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sel-item-meta { display: flex; align-items: center; gap: 5px; margin-top: 1px; }
+  .sel-lens-tag { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 6px; }
+  .sel-score-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink4); }
+
+  .lens-people { background: var(--purple-mid); color: var(--purple); }
+  .lens-process { background: var(--accent-mid); color: var(--accent); }
+  .lens-technology { background: var(--teal-mid); color: var(--teal); }
+
+  /* Weights */
+  .weights-section {}
+  .weight-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    align-items: center; gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .weight-row:last-child { border-bottom: none; }
+  .wr-name { font-size: 11px; color: var(--ink2); font-weight: 500; }
+  .wr-slider { width: 64px; accent-color: var(--accent); cursor: pointer; }
+  .wr-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent); min-width: 34px; text-align: right; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; font-size: 11px; }
+  .total-ok { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .total-err { color: var(--red); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── MAIN ── */
+  .main { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: flex; flex-direction: column; gap: 14px; animation: fadeUp .3s cubic-bezier(.16,1,.3,1); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .card-head {
+    padding: 13px 18px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-head-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-head-icon.blue { background: var(--accent-light); border: 1px solid var(--accent-mid); }
+  .card-head-icon.green { background: var(--green-light); border: 1px solid var(--green-mid); }
+  .card-head-icon.amber { background: var(--amber-light); border: 1px solid var(--amber-mid); }
+  .card-head-icon.purple { background: var(--purple-light); border: 1px solid var(--purple-mid); }
+  .card-head-text h2 {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink3);
+  }
+  .card-head-text p { font-size: 11px; color: var(--ink3); margin-top: 1px; }
+  .card-body { padding: 14px 18px 16px; }
+
+  /* ── WELCOME ── */
+  .welcome-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 32px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-blue);
+  }
+  .welcome-hero::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,87,255,.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .welcome-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.7);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .welcome-hero h1 {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    line-height: 1.2;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .welcome-hero p {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.7;
+  }
+  .how-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; text-align: left; }
+  @media (max-width: 700px) { .how-cards { grid-template-columns: 1fr; } }
+  .how-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .how-card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 800;
+    color: #fbbf24;
+    background: rgba(251,191,36,.15);
+    border: 1px solid rgba(251,191,36,.3);
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .how-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 5px; letter-spacing: -0.1px; color: #fff; }
+  .how-card p { font-size: 12px; color: rgba(255,255,255,.5); line-height: 1.6; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 24px;
+    background: var(--accent);
+    color: var(--white);
+    border: none; border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .18s;
+    letter-spacing: -0.1px;
+    box-shadow: 0 4px 12px rgba(0,87,255,.25);
+  }
+  .btn-primary:hover { background: #0041CC; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,87,255,.3); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    background: var(--white); color: var(--ink2);
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+  }
+  .btn-secondary:hover { background: var(--bg); border-color: var(--border2); }
+
+  /* ── CONFIGURE ── */
+  .param-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 52px;
+    align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .param-row:last-child { border-bottom: none; }
+  .pr-label { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: -0.1px; }
+  .pr-lens-tag {
+    font-size: 9px; font-weight: 700; padding: 1px 6px;
+    border-radius: 5px; margin-top: 3px; display: inline-block; letter-spacing: 0.1px;
+  }
+  .pr-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 500;
+    padding: 6px 30px 6px 10px;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2371717a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    transition: all .15s;
+  }
+  .pr-select:hover { border-color: var(--border2); background-color: var(--white); }
+  .pr-select:focus { outline: none; border-color: var(--accent); background-color: var(--white); box-shadow: 0 0 0 3px rgba(0,87,255,.1); }
+  .pr-score-box {
+    text-align: center;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 5px 4px;
+    transition: all .2s;
+  }
+  .pr-score-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 600;
+    display: block; line-height: 1;
+  }
+  .pr-score-label { font-size: 9px; color: var(--ink4); margin-top: 2px; font-weight: 500; }
+
+  .run-full-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 11px;
+    background: var(--accent); color: var(--white);
+    border: none; border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .18s;
+    letter-spacing: -0.1px; margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0,87,255,.25);
+  }
+  .run-full-btn:hover { background: #0041CC; transform: translateY(-1px); }
+  .run-full-btn:active { transform: translateY(0); }
+
+  /* ── WINNER CARD ── */
+  .winner-card {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow-blue);
+  }
+  .winner-card::before {
+    content: '';
+    position: absolute;
+    right: -30px; top: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,87,255,.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .winner-label {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 8px;
+  }
+  .winner-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
+  .winner-name { font-size: clamp(16px, 2.5vw, 22px); font-weight: 800; letter-spacing: -0.4px; color: #fff; }
+  .winner-score-wrap { text-align: right; flex-shrink: 0; }
+  .winner-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700; line-height: 1; display: block; color: #fbbf24;
+  }
+  .winner-score-sub { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; font-weight: 500; }
+  .tier-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.1px;
+  }
+  .tier-best { background: rgba(0,184,124,.2); color: #34d399; border: 1px solid rgba(0,184,124,.3); }
+  .tier-good { background: rgba(0,87,255,.25); color: #93c5fd; border: 1px solid rgba(0,87,255,.3); }
+  .tier-cond { background: rgba(245,158,11,.2); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+  .tier-low  { background: rgba(229,57,53,.2); color: #fca5a5; border: 1px solid rgba(229,57,53,.3); }
+  .winner-cap { font-size: 12px; color: rgba(255,255,255,.65); line-height: 1.55; margin-bottom: 5px; }
+  .winner-use {
+    font-size: 11px; color: rgba(255,255,255,.45); margin-bottom: 12px;
+    padding: 6px 10px; background: rgba(255,255,255,.06); border-radius: 6px;
+    border-left: 2px solid rgba(0,87,255,.5);
+  }
+  .gap-strip {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 12px; background: rgba(245,158,11,.12);
+    border-radius: 7px; border: 1px solid rgba(245,158,11,.25);
+    font-size: 11px; gap: 8px; flex-wrap: wrap;
+  }
+  .gap-strip-label { color: rgba(255,255,255,.5); font-weight: 500; }
+  .gap-strip-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fbbf24; font-size: 12px; }
+  .why-strip {
+    margin-top: 8px; padding: 9px 13px;
+    background: rgba(0,87,255,.15); border-radius: 7px;
+    border: 1px solid rgba(0,87,255,.25);
+    font-size: 11px; line-height: 1.6; color: rgba(255,255,255,.65);
+  }
+
+  /* ── LEADERBOARD ── */
+  .lb-grid { display: flex; flex-direction: column; gap: 4px; }
+  .lb-item {
+    display: grid;
+    grid-template-columns: 28px 1fr 100px 50px 76px;
+    align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: var(--white);
+    transition: all .15s; cursor: default;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .lb-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .lb-item.rank-1 { background: var(--r1-bg); border-color: var(--r1-border); }
+  .lb-item.rank-2 { background: var(--r2-bg); border-color: var(--r2-border); }
+  .lb-item.rank-3 { background: var(--r3-bg); border-color: var(--r3-border); }
+
+  .lb-rank {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; text-align: center;
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .r1 { background: var(--amber-mid); color: var(--gold); }
+  .r2 { background: var(--border); color: var(--silver); }
+  .r3 { background: #fed7aa; color: var(--bronze); }
+  .rn { color: var(--ink4); font-size: 10px; }
+
+  .lb-name { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: -0.1px; }
+  .lb-cat { font-size: 10px; color: var(--ink3); margin-top: 1px; font-weight: 500; }
+  .lb-bar-wrap { display: flex; align-items: center; gap: 5px; }
+  .lb-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .lb-bar-fill { height: 100%; border-radius: 2px; transition: width 1.1s cubic-bezier(.16,1,.3,1); }
+  .lb-score { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-align: right; color: var(--accent); }
+  .lb-cue {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 20px; text-align: center; white-space: nowrap; letter-spacing: 0.1px;
+  }
+  .cue-top { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+  .cue-run { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-mid); }
+  .cue-qual { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-mid); }
+  .cue-rev { background: var(--bg2); color: var(--ink3); border: 1px solid var(--border); }
+
+  /* ── COMPARISON ── */
+  .compare-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .compare-2 { grid-template-columns: 1fr; } }
+  .cmp-card {
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    background: var(--white); box-shadow: var(--shadow);
+  }
+  .cmp-card.is-win { border-color: var(--accent-mid); border-width: 1.5px; background: var(--accent-light); }
+
+  /* ── NAV FOOTER ── */
+  .step-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 32px; background: var(--white);
+    border-top: 1px solid var(--border);
+    position: sticky; bottom: 0; z-index: 50;
+    height: 64px; box-shadow: 0 -2px 8px rgba(0,0,0,.05);
+  }
+  .nav-steps { display: flex; align-items: center; gap: 8px; }
+  .nav-step-dot {
+    height: 4px; border-radius: 2px;
+    background: var(--border2); transition: all .25s; width: 20px;
+  }
+  .nav-step-dot.active { background: var(--accent); width: 32px; }
+  .nav-step-dot.done { background: var(--green); }
+  .cmp-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--ink4); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .cmp-badge-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .cmp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .cmp-name { font-size: 13px; font-weight: 800; letter-spacing: -0.2px; }
+  .cmp-cat { font-size: 10px; color: var(--ink3); margin-top: 2px; font-weight: 500; }
+  .cmp-score { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; }
+  .cmp-score.win { color: var(--green); }
+  .cmp-score.run { color: var(--amber); }
+  .metric-row { margin-bottom: 8px; }
+  .metric-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .metric-name { font-size: 11px; color: var(--ink3); font-weight: 600; }
+  .metric-stars { font-size: 11px; }
+  .metric-bar-bg { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .metric-bar-fill { height: 100%; border-radius: 3px; transition: width 1.1s cubic-bezier(.16,1,.3,1); }
+  .metric-bar-fill.win { background: var(--green); }
+  .metric-bar-fill.run { background: var(--amber); }
+
+  /* ── WEIGHTS DISPLAY ── */
+  .pct-display { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent); }
+
+  /* ── ACCORDION ── */
+  .accordion-item { border-bottom: 1px solid var(--border); }
+  .accordion-item:last-child { border-bottom: none; }
+  .accordion-trigger {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 10px 0;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 700; color: var(--ink);
+    text-align: left; transition: color .15s;
+  }
+  .accordion-trigger:hover { color: var(--accent); }
+  .acc-arrow { font-size: 11px; color: var(--ink4); transition: transform .2s; }
+  .accordion-trigger.open .acc-arrow { transform: rotate(90deg); }
+  .accordion-content { display: none; padding-bottom: 10px; }
+  .accordion-content.open { display: block; animation: fadeIn .2s ease; }
+  .tool-detail { font-size: 11px; color: var(--ink3); line-height: 1.6; }
+  .tool-detail strong { color: var(--ink2); font-weight: 600; }
+  .lens-scores { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+  .ls-pill { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+
+  /* ── NAV FOOTER ── */
+  .step-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 32px; background: var(--white);
+    border-top: 1px solid var(--border);
+    position: sticky; bottom: 0; z-index: 50;
+    height: 64px;
+  }
+  .nav-steps { display: flex; align-items: center; gap: 8px; }
+  .nav-step-dot {
+    height: 4px; border-radius: 2px;
+    background: var(--border2); transition: all .25s;
+    width: 20px;
+  }
+  .nav-step-dot.active { background: var(--ink); width: 32px; }
+  .nav-step-dot.done { background: var(--green); }
+
+  select option { background: var(--white); color: var(--ink); }
+
+  /* ── HOME MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(6,21,43,.65);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn .2s ease; }
+  .modal-box {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    position: relative;
+  }
+  .modal-icon {
+    width: 40px; height: 40px;
+    background: var(--amber-light);
+    border: 1px solid var(--amber-mid);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .modal-title {
+    font-size: 15px; font-weight: 800;
+    color: var(--ink); letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .modal-body {
+    font-size: 13px; color: var(--ink2);
+    line-height: 1.65; margin-bottom: 22px;
+  }
+  .modal-actions {
+    display: flex; gap: 10px;
+  }
+  .modal-btn-ok {
+    flex: 1; padding: 10px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .18s;
+    box-shadow: 0 4px 12px rgba(0,87,255,.2);
+  }
+  .modal-btn-ok:hover { background: #0041CC; }
+  .modal-btn-home {
+    flex: 1; padding: 10px;
+    background: var(--white); color: var(--ink2);
+    border: 1.5px solid var(--border2);
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .modal-btn-home:hover { background: var(--bg); border-color: var(--ink4); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <span class="brand-name" style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.3px;">AI Tool Predictor</span>
+  <div class="step-pills-bar">
+    <button class="step-pill active" onclick="goTo(0)" id="spill-0"><span class="step-num">1</span>Overview</button>
+    <span class="step-sep">›</span>
+    <button class="step-pill" onclick="goTo(1)" id="spill-1"><span class="step-num">2</span>Configure</button>
+    <span class="step-sep">›</span>
+    <button class="step-pill" onclick="goTo(2)" id="spill-2"><span class="step-num">3</span>Results</button>
+  </div>
+  <button class="home-btn" onclick="openHomeModal()">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 6.5L7 1.5L13 6.5V13H9.5V9.5H4.5V13H1V6.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/>
+    </svg>
+    Home
+  </button>
+</nav>
+
+<!-- HOME MODAL -->
+<div class="modal-overlay" id="homeModal">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 3L10 11M10 14v.5" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="10" cy="10" r="8.5" stroke="#d97706" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="modal-title">Before you leave</div>
+    <div class="modal-body">
+      Please ensure you save your results externally, as this tool does not automatically store or retain any output.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-ok" onclick="closeHomeModal()">OK, continue</button>
+      <button class="modal-btn-home" onclick="goHome()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+          <path d="M1 6.5L7 1.5L13 6.5V13H9.5V9.5H4.5V13H1V6.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+        Home
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-title">Current Selections</div>
+      <div class="sel-summary" style="margin-top:10px;" id="sel-summary">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Weights -->
+    <div class="weights-section">
+      <div class="sidebar-title">Decision Weights</div>
+      <div style="margin-top:12px;">
+        <div class="weight-row" id="wr-objective">
+          <span class="wr-name">Objective</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="20" oninput="syncWeight('objective',this.value)">
+          <span class="wr-val pct-display" id="wv-objective">20%</span>
+        </div>
+        <div class="weight-row" id="wr-problem">
+          <span class="wr-name">Customer Problem</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="20" oninput="syncWeight('problem',this.value)">
+          <span class="wr-val pct-display" id="wv-problem">20%</span>
+        </div>
+        <div class="weight-row" id="wr-deploy">
+          <span class="wr-name">Deployment</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="10" oninput="syncWeight('deploy',this.value)">
+          <span class="wr-val pct-display" id="wv-deploy">10%</span>
+        </div>
+        <div class="weight-row" id="wr-automation">
+          <span class="wr-name">Automation</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="25" oninput="syncWeight('automation',this.value)">
+          <span class="wr-val pct-display" id="wv-automation">25%</span>
+        </div>
+        <div class="weight-row" id="wr-cx">
+          <span class="wr-name">CX Impact</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="15" oninput="syncWeight('cx',this.value)">
+          <span class="wr-val pct-display" id="wv-cx">15%</span>
+        </div>
+        <div class="weight-row" id="wr-ops">
+          <span class="wr-name">Ops Efficiency</span>
+          <input type="range" class="wr-slider" min="0" max="60" step="5" value="10" oninput="syncWeight('ops',this.value)">
+          <span class="wr-val pct-display" id="wv-ops">10%</span>
+        </div>
+        <div class="total-row" id="total-row">
+          <span style="font-size:12px;color:var(--ink3);">Total</span>
+          <span class="total-ok" id="total-val">100% ✓</span>
+        </div>
+        <!-- Donut -->
+        <div style="margin-top:14px;" id="donut-area">
+          <canvas id="donutChart" width="200" height="100" role="img" aria-label="Donut chart showing weight distribution across 6 decision parameters"></canvas>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- STEP 0: OVERVIEW -->
+    <div class="step-panel active" id="step-0">
+      <div class="welcome-hero">
+        <div class="welcome-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M4 6l1.5 1.5L8 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          22 AI tools · Lens-adjusted scoring
+        </div>
+        <h1>Find the right AI sales tool for any client opportunity</h1>
+        <p>Answer 6 questions about your client's objective, problem, and scale of ambition. The engine scores all 22 tools and surfaces the best-fit recommendation in seconds.</p>
+        <div class="how-cards">
+          <div class="how-card">
+            <div class="how-card-num">01</div>
+            <h3>Pick your inputs</h3>
+            <p>Select the client's objective, problem, deployment timeline, automation target, CX goal, and ops improvement.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-card-num">02</div>
+            <h3>Tune the weights</h3>
+            <p>Adjust how much each parameter influences the ranking. Weights must add up to 100%.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-card-num">03</div>
+            <h3>Get your pick</h3>
+            <p>See the ranked leaderboard, top-2 comparison, and a ready-to-use positioning narrative.</p>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo(1)">Start configuring →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: CONFIGURE -->
+    <div class="step-panel" id="step-1">
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon blue">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zM6 8l1.5 1.5L10.5 6" stroke="#1a56db" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="card-head-text">
+            <h2>Client Parameters</h2>
+            <p>Each selection maps to a 1–5 score. The engine blends these with your weights.</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- Objective -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">Objective</div>
+              <span class="pr-lens-tag lens-technology" id="pr-lens-obj">Technology</span>
+            </div>
+            <select class="pr-select" id="cfg-objective" onchange="syncFromSelect('objective')">
+              <option value="CX Transformation">CX Transformation</option>
+              <option value="Conversational AI">Conversational AI</option>
+              <option value="Contact Center Intelligence">Contact Center Intelligence</option>
+              <option value="AI Workflow Automation">AI Workflow Automation</option>
+              <option value="Employee Performance">Employee Performance</option>
+              <option value="CX Analytics">CX Analytics</option>
+              <option value="Agent Assist / Copilot">Agent Assist / Copilot</option>
+              <option value="Outbound Sales Enablement">Outbound Sales Enablement</option>
+              <option value="Autonomous Engagement">Autonomous Engagement</option>
+              <option value="Coach AI">Coach AI</option>
+              <option value="Process Intelligence">Process Intelligence</option>
+              <option value="Knowledge Discovery">Knowledge Discovery</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-obj" style="color:var(--accent)">—</span>
+              <span class="pr-score-label">Matrix</span>
+            </div>
+          </div>
+
+          <!-- Problem -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">Customer Problem</div>
+              <span class="pr-lens-tag lens-technology" id="pr-lens-prob">Technology</span>
+            </div>
+            <select class="pr-select" id="cfg-problem" onchange="syncFromSelect('problem')">
+              <option value="Virtual assistants / self-service">Virtual assistants / self-service</option>
+              <option value="High contact center workload">High contact center workload</option>
+              <option value="Improve agent productivity">Improve agent productivity</option>
+              <option value="Need AI workflow automation">Need AI workflow automation</option>
+              <option value="Improve employee engagement">Improve employee engagement</option>
+              <option value="Need CX analytics &amp; insights">Need CX analytics &amp; insights</option>
+              <option value="Need omnichannel modernization">Need omnichannel modernization</option>
+              <option value="Need QA / compliance recording">Need QA / compliance recording</option>
+              <option value="Need real-time agent guidance">Need real-time agent guidance</option>
+              <option value="Need outbound sales objection handling">Need outbound sales objection handling</option>
+              <option value="Need lightweight browser-based assist">Need lightweight browser-based assist</option>
+              <option value="Need voice autopilot / call deflection">Need voice autopilot / call deflection</option>
+              <option value="Need agent coaching &amp; simulation">Need agent coaching &amp; simulation</option>
+              <option value="Need process adherence monitoring">Need process adherence monitoring</option>
+              <option value="Need process discovery &amp; optimization">Need process discovery &amp; optimization</option>
+              <option value="Need knowledge discovery / business Q&amp;A">Need knowledge discovery / business Q&amp;A</option>
+              <option value="Need direct-to-client insights platform">Need direct-to-client insights platform</option>
+              <option value="Need rapid deployment without CTI">Need rapid deployment without CTI</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-prob" style="color:var(--accent)">—</span>
+              <span class="pr-score-label">Matrix</span>
+            </div>
+          </div>
+
+          <!-- Deploy -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">Deployment Timeline</div>
+            </div>
+            <select class="pr-select" id="cfg-deploy" onchange="updateScoreBoxes()">
+              <option value="3-4 weeks">3-4 weeks</option>
+              <option value="<=2 weeks">&lt;= 2 weeks</option>
+              <option value="5-8 weeks">5-8 weeks</option>
+              <option value="9-16 weeks">9-16 weeks</option>
+              <option value=">16 weeks">&gt; 16 weeks</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-deploy" style="color:var(--accent)">4</span>
+              <span class="pr-score-label">/ 5</span>
+            </div>
+          </div>
+
+          <!-- Automation -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">Automation Coverage</div>
+            </div>
+            <select class="pr-select" id="cfg-automation" onchange="updateScoreBoxes()">
+              <option value="60-79% automated">60-79% automated</option>
+              <option value="<20% automated">&lt; 20% automated</option>
+              <option value="20-39% automated">20-39% automated</option>
+              <option value="40-59% automated">40-59% automated</option>
+              <option value=">=80% automated">&gt;= 80% automated</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-auto" style="color:var(--accent)">4</span>
+              <span class="pr-score-label">/ 5</span>
+            </div>
+          </div>
+
+          <!-- CX -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">CX Improvement</div>
+            </div>
+            <select class="pr-select" id="cfg-cx" onchange="updateScoreBoxes()">
+              <option value="15-24% CSAT / 30-49% faster">15-24% CSAT / 30-49% faster</option>
+              <option value="No measurable lift">No measurable lift</option>
+              <option value="<5% CSAT / <10% faster">&lt;5% CSAT / &lt;10% faster</option>
+              <option value="5-14% CSAT / 10-29% faster">5-14% CSAT / 10-29% faster</option>
+              <option value=">=25% CSAT / >=50% faster">&gt;= 25% CSAT / &gt;= 50% faster</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-cx" style="color:var(--accent)">4</span>
+              <span class="pr-score-label">/ 5</span>
+            </div>
+          </div>
+
+          <!-- Ops -->
+          <div class="param-row">
+            <div>
+              <div class="pr-label">Ops Efficiency Gain</div>
+            </div>
+            <select class="pr-select" id="cfg-ops" onchange="updateScoreBoxes()">
+              <option value="25-39% efficiency gain">25-39% efficiency gain</option>
+              <option value="<5% efficiency gain">&lt;5% efficiency gain</option>
+              <option value="5-14% efficiency gain">5-14% efficiency gain</option>
+              <option value="15-24% efficiency gain">15-24% efficiency gain</option>
+              <option value=">=40% efficiency gain">&gt;= 40% efficiency gain</option>
+            </select>
+            <div class="pr-score-box">
+              <span class="pr-score-num" id="ps-ops" style="color:var(--accent)">4</span>
+              <span class="pr-score-label">/ 5</span>
+            </div>
+          </div>
+
+          <button class="run-full-btn" onclick="runAndShow()">Analyse all 22 tools →</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STEP 2: RESULTS -->
+    <div class="step-panel" id="step-2">
+
+      <!-- Winner -->
+      <div class="winner-card" id="winner-card">
+        <div class="winner-label">Recommended tool</div>
+        <div class="winner-top">
+          <div>
+            <div class="winner-name" id="r-name">—</div>
+            <div id="r-tier" style="margin-top:8px;"></div>
+          </div>
+          <div class="winner-score-wrap">
+            <span class="winner-score" id="r-score" style="color:#fbbf24">—</span>
+            <div class="winner-score-sub">/ 100 lens-adjusted</div>
+          </div>
+        </div>
+        <div class="winner-cap" id="r-cap"></div>
+        <div class="winner-use" id="r-use"></div>
+        <div class="gap-strip">
+          <span class="gap-strip-label">Score gap vs runner-up (<span id="r-runner-name">—</span>)</span>
+          <span class="gap-strip-val" id="r-gap">—</span>
+        </div>
+        <div class="why-strip" id="r-why"></div>
+      </div>
+
+      <!-- Top-2 comparison -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon amber">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-7" stroke="#854f0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="card-head-text">
+            <h2>Top-2 comparison</h2>
+            <p>Side-by-side breakdown of winner vs runner-up</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="compare-2" id="compare-body"></div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon purple">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="3" height="5" rx="1" fill="#534ab7"/><rect x="6.5" y="5" width="3" height="9" rx="1" fill="#534ab7"/><rect x="11" y="2" width="3" height="12" rx="1" fill="#534ab7"/></svg>
+          </div>
+          <div class="card-head-text">
+            <h2>Full leaderboard</h2>
+            <p>All 22 tools ranked by lens-adjusted score</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="lb-grid" id="lb-body"></div>
+        </div>
+      </div>
+
+      <!-- Tool detail accordion -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon green">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#0f6e56" stroke-width="1.5"/><path d="M8 5v4M8 11v0.5" stroke="#0f6e56" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="card-head-text">
+            <h2>Tool details</h2>
+            <p>Expand any tool to see capability, fit rationale, and lens scores</p>
+          </div>
+        </div>
+        <div class="card-body" id="acc-body"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <button class="btn-secondary" onclick="goTo(1)">← Adjust inputs</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="step-nav">
+  <div>
+    <span style="font-size:12px;color:var(--ink3);" id="step-context">Step 1 of 3 — Overview</span>
+  </div>
+  <div class="nav-steps">
+    <div class="nav-step-dot active" id="nd-0"></div>
+    <div class="nav-step-dot" id="nd-1"></div>
+    <div class="nav-step-dot" id="nd-2"></div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn-secondary" id="btn-prev" onclick="prevStep()" style="display:none;">← Back</button>
+    <button class="btn-primary" id="btn-next" onclick="nextStep()">Start →</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════════════════════════════
+const TOOLS = [
+  { name:"Connex AI", cat:"Platform", avail:"Existing", primary:"End-to-end CX AI platform including conversational AI, analytics, omnichannel, workforce mgmt and automation", use:"Full CX transformation / omnichannel contact center modernization", deploy:3, auto:5, cx:5, ops:5, people:4, process:5, tech:5 },
+  { name:"Crew AI", cat:"Platform", avail:"Existing", primary:"Multi-agent AI orchestration framework enabling collaboration between autonomous AI agents", use:"AI engineering / multi-agent automation projects", deploy:3, auto:5, cx:3, ops:3, people:2, process:5, tech:5 },
+  { name:"Uniphore", cat:"Platform", avail:"Existing", primary:"Conversational intelligence platform focused on agent assist, conversation analytics, and autonomous agents", use:"Contact center conversational intelligence and agent assist", deploy:3, auto:4, cx:5, ops:4, people:4, process:4, tech:5 },
+  { name:"Centrical", cat:"Platform", avail:"Existing", primary:"AI-driven performance management platform combining learning, gamification, and employee engagement", use:"Employee performance, learning, and engagement transformation", deploy:5, auto:3, cx:3, ops:4, people:5, process:3, tech:3 },
+  { name:"Kore.ai", cat:"Platform", avail:"Existing", primary:"Enterprise conversational AI platform for building chatbots, voice bots, and automated workflows", use:"Enterprise conversational AI deployments and self-service automation", deploy:3, auto:5, cx:5, ops:5, people:3, process:4, tech:5 },
+  { name:"DataOrb", cat:"Platform", avail:"Existing", primary:"AI-driven customer interaction analytics and CX intelligence platform", use:"CX analytics, customer intelligence, and operational optimization", deploy:4, auto:4, cx:4, ops:4, people:3, process:4, tech:4 },
+  { name:"One Insight", cat:"Insights", avail:"Recommended", primary:"Strategic CX intelligence built on One Journey for conversational analytics and QA automation", use:"Konecta-internal insights, QA automation, and CX intelligence", deploy:4, auto:4, cx:4, ops:4, people:3, process:4, tech:4 },
+  { name:"DataOrb Insights", cat:"Insights", avail:"Recommended", primary:"Conversational intelligence and proactive CX insights with predictive and intervene capabilities", use:"Direct client insights sales, proactive recovery, and analytics-led CX transformation", deploy:4, auto:4, cx:5, ops:4, people:3, process:5, tech:4 },
+  { name:"Uniphore Insights", cat:"Insights", avail:"Recommended", primary:"Insights capability paired with Uniphore augmentation and conversation analytics", use:"Cost-efficient insights when Uniphore co-pilot is already part of the stack", deploy:3, auto:4, cx:4, ops:4, people:4, process:4, tech:5 },
+  { name:"One Copilot", cat:"Co-pilot (Inbound)", avail:"Recommended", primary:"Konecta inbound co-pilot for voice and written channels on One Journey", use:"Inbound agent assist with cloud CTI and broad multilingual coverage", deploy:4, auto:3, cx:4, ops:4, people:4, process:4, tech:4 },
+  { name:"Uniphore Co-pilot", cat:"Co-pilot (Inbound)", avail:"Recommended", primary:"Real-time agent augmentation with proactive knowledge suggestions and strong on-prem CTI fit", use:"Inbound co-pilot for on-prem or hybrid CTI with proactive live guidance", deploy:3, auto:3, cx:5, ops:4, people:4, process:4, tech:5 },
+  { name:"Kore.ai Co-pilot", cat:"Co-pilot (Inbound)", avail:"By opportunity", primary:"Conversational AI co-pilot with broad language coverage and case-by-case positioning", use:"Special language coverage or specific client-positioning opportunities", deploy:3, auto:4, cx:4, ops:4, people:3, process:4, tech:5 },
+  { name:"Sales Objection Engine", cat:"Co-pilot (Outbound)", avail:"Recommended", primary:"Uniphore outbound sales co-pilot combining UAssist real-time guidance with UDiscover analytics", use:"Outbound sales objection handling, coaching, and sales analytics", deploy:3, auto:3, cx:5, ops:5, people:4, process:4, tech:5 },
+  { name:"Magic Button", cat:"Light Co-pilot", avail:"Recommended", primary:"Browser-extension light co-pilot without CTI for writing, translation, email, and KB search", use:"Fast deployment for written channels or first-step agent assistance", deploy:5, auto:2, cx:3, ops:3, people:4, process:3, tech:3 },
+  { name:"11Labs Autopilot", cat:"Autopilot", avail:"Recommended", primary:"Voice-first autopilot for natural AI engagement with GenAI CoE accelerators", use:"New autopilot deployments, voice automation, and rapid use-case rollout", deploy:4, auto:5, cx:5, ops:5, people:2, process:4, tech:5 },
+  { name:"Kore.ai Autopilot", cat:"Autopilot", avail:"By opportunity", primary:"Autopilot platform for selective opportunities where Kore.ai has strategic value", use:"Case-by-case autopilot positioning with existing Kore.ai relationships", deploy:3, auto:5, cx:4, ops:4, people:2, process:4, tech:5 },
+  { name:"Uniphore Autopilot", cat:"Autopilot", avail:"By opportunity", primary:"Autopilot capability only when Uniphore is already the broader stack", use:"Case-by-case extension where client already runs full Uniphore stack", deploy:2, auto:4, cx:3, ops:3, people:2, process:4, tech:4 },
+  { name:"One Coach", cat:"Coach AI", avail:"Pilot/controlled", primary:"Konecta-native coaching platform with alerts and optimized learning paths", use:"Controlled coaching pilots, training optimization, and internal ecosystem fit", deploy:4, auto:2, cx:3, ops:4, people:5, process:4, tech:3 },
+  { name:"Learning Hub (DataOrb)", cat:"Coach AI", avail:"Recommended", primary:"Production-grade coaching with Drill simulation, Digital Twin, and grounded recommendations", use:"Scalable agent coaching, simulations, onboarding, and continuous improvement", deploy:3, auto:2, cx:4, ops:4, people:5, process:5, tech:3 },
+  { name:"Process Adherence", cat:"Contextual Intelligence", avail:"Recommended", primary:"AI-powered SOP adherence evaluation with evidence-based dialogue citations", use:"Complex SOP compliance monitoring and decision-tree process evaluation", deploy:3, auto:2, cx:4, ops:4, people:3, process:5, tech:4 },
+  { name:"Process Discovery", cat:"Contextual Intelligence", avail:"Recommended", primary:"Agentic process discovery using multimodal data capture and workflow mapping", use:"Process mining, optimization, and agentic automation discovery", deploy:3, auto:3, cx:3, ops:5, people:2, process:5, tech:4 },
+  { name:"Knowledge Discovery", cat:"Contextual Intelligence", avail:"Recommended", primary:"Ask Mira Pro business Q&A and knowledge synthesis across interaction data", use:"Operational analytics, trend discovery, and interactive business Q&A", deploy:3, auto:2, cx:4, ops:3, people:3, process:4, tech:4 },
+];
+
+const OBJ_MATRIX = {
+  "Connex AI":[5,4,5,3,2,4,4,3,4,3,4,3],"Crew AI":[2,2,2,5,1,2,4,3,4,3,4,3],
+  "Uniphore":[4,4,5,3,2,4,4,3,4,3,4,3],"Centrical":[1,1,2,1,5,2,4,3,4,3,4,3],
+  "Kore.ai":[4,5,4,4,2,2,4,3,4,3,4,3],"DataOrb":[2,2,3,1,2,5,4,3,4,3,4,3],
+  "One Insight":[4,2,5,2,3,4,2,3,1,3,4,3],"DataOrb Insights":[4,2,5,2,3,5,2,3,1,3,4,4],
+  "Uniphore Insights":[4,2,5,2,3,4,3,3,1,3,4,4],"One Copilot":[4,4,4,3,3,2,5,2,2,2,3,2],
+  "Uniphore Co-pilot":[4,4,5,3,3,2,5,2,2,2,3,2],"Kore.ai Co-pilot":[4,5,4,3,3,2,4,2,3,2,3,2],
+  "Sales Objection Engine":[3,4,4,3,3,3,4,5,2,3,3,2],"Magic Button":[3,3,3,2,3,1,4,2,1,2,2,2],
+  "11Labs Autopilot":[4,5,3,5,1,1,2,4,5,1,3,1],"Kore.ai Autopilot":[4,4,3,5,1,1,2,4,5,1,3,1],
+  "Uniphore Autopilot":[4,4,3,4,1,1,2,4,4,1,3,1],"One Coach":[3,1,3,1,5,2,2,3,1,4,3,2],
+  "Learning Hub (DataOrb)":[3,1,4,1,5,2,2,3,1,5,3,2],"Process Adherence":[4,1,4,3,2,4,1,2,2,2,5,3],
+  "Process Discovery":[4,1,4,4,2,4,1,2,2,2,5,5],"Knowledge Discovery":[4,1,4,3,2,4,1,2,2,2,4,5]
+};
+const OBJ_KEYS = ["CX Transformation","Conversational AI","Contact Center Intelligence","AI Workflow Automation","Employee Performance","CX Analytics","Agent Assist / Copilot","Outbound Sales Enablement","Autonomous Engagement","Coach AI","Process Intelligence","Knowledge Discovery"];
+
+const PROB_MATRIX = {
+  "Connex AI":[5,4,4,3,2,3,5,3,4,3,2,4,3,4,4,3,4,2],"Crew AI":[1,2,2,5,1,2,1,1,4,3,2,4,3,4,4,3,4,2],
+  "Uniphore":[4,4,5,3,2,4,4,5,4,3,2,4,3,4,4,3,4,2],"Centrical":[1,1,3,1,5,2,1,2,4,3,2,4,3,4,4,3,4,2],
+  "Kore.ai":[4,5,4,4,2,2,4,3,4,3,2,4,3,4,4,3,4,2],"DataOrb":[3,2,4,1,2,5,3,4,4,3,2,4,3,4,4,3,4,2],
+  "One Insight":[3,2,4,1,2,4,3,4,2,3,1,1,3,4,4,4,3,2],"DataOrb Insights":[3,2,4,1,2,5,3,5,2,3,1,1,3,4,4,4,5,2],
+  "Uniphore Insights":[3,2,4,1,2,4,3,4,3,3,1,1,3,4,4,4,5,2],"One Copilot":[4,2,5,3,2,2,3,4,4,2,3,1,2,3,2,1,2,2],
+  "Uniphore Co-pilot":[4,2,5,3,2,2,3,4,5,2,3,1,2,3,2,1,2,3],"Kore.ai Co-pilot":[4,4,5,3,2,2,3,4,4,2,3,1,2,3,2,1,2,3],
+  "Sales Objection Engine":[3,1,5,3,2,3,2,4,5,5,2,1,4,3,2,1,2,2],"Magic Button":[2,1,4,2,2,1,1,2,2,2,5,1,2,1,1,2,1,5],
+  "11Labs Autopilot":[5,5,3,5,1,1,3,2,1,4,1,5,1,2,2,1,2,3],"Kore.ai Autopilot":[5,4,3,5,1,1,3,2,1,4,1,4,1,2,2,1,2,3],
+  "Uniphore Autopilot":[5,5,3,5,1,1,3,2,1,4,1,3,1,2,2,1,2,3],"One Coach":[2,1,4,1,5,3,1,3,3,3,1,1,4,3,2,2,1,1],
+  "Learning Hub (DataOrb)":[2,1,4,1,5,3,1,3,3,3,1,1,5,3,2,2,1,1],"Process Adherence":[2,1,3,4,1,4,2,5,2,2,1,1,2,5,5,5,3,1],
+  "Process Discovery":[2,1,3,4,1,4,2,5,2,2,1,1,2,5,5,5,3,1],"Knowledge Discovery":[2,1,3,4,1,4,2,5,2,2,1,1,2,5,5,5,3,1]
+};
+const PROB_KEYS = ["High contact center workload","Virtual assistants / self-service","Improve agent productivity","Need AI workflow automation","Improve employee engagement","Need CX analytics & insights","Need omnichannel modernization","Need QA / compliance recording","Need real-time agent guidance","Need outbound sales objection handling","Need lightweight browser-based assist","Need voice autopilot / call deflection","Need agent coaching & simulation","Need process adherence monitoring","Need process discovery & optimization","Need knowledge discovery / business Q&A","Need direct-to-client insights platform","Need rapid deployment without CTI"];
+
+const DEPLOY_SCORES  = {"<=2 weeks":5,"3-4 weeks":4,"5-8 weeks":3,"9-16 weeks":2,">16 weeks":1};
+const AUTO_SCORES    = {"<20% automated":1,"20-39% automated":2,"40-59% automated":3,"60-79% automated":4,">=80% automated":5};
+const CX_SCORES      = {"No measurable lift":1,"<5% CSAT / <10% faster":2,"5-14% CSAT / 10-29% faster":3,"15-24% CSAT / 30-49% faster":4,">=25% CSAT / >=50% faster":5};
+const OPS_SCORES     = {"<5% efficiency gain":1,"5-14% efficiency gain":2,"15-24% efficiency gain":3,"25-39% efficiency gain":4,">=40% efficiency gain":5};
+
+const OBJ_LENS = {
+  "CX Transformation":"Process","Conversational AI":"Technology","Contact Center Intelligence":"People",
+  "AI Workflow Automation":"Technology","Employee Performance":"People","CX Analytics":"Technology",
+  "Agent Assist / Copilot":"People","Outbound Sales Enablement":"People","Autonomous Engagement":"Technology",
+  "Coach AI":"People","Process Intelligence":"Process","Knowledge Discovery":"Technology"
+};
+const PROB_LENS = {
+  "High contact center workload":"Process","Virtual assistants / self-service":"Technology",
+  "Improve agent productivity":"People","Need AI workflow automation":"Technology",
+  "Improve employee engagement":"People","Need CX analytics & insights":"Technology",
+  "Need omnichannel modernization":"Technology","Need QA / compliance recording":"Process",
+  "Need real-time agent guidance":"People","Need outbound sales objection handling":"People",
+  "Need lightweight browser-based assist":"Technology","Need voice autopilot / call deflection":"Technology",
+  "Need agent coaching & simulation":"People","Need process adherence monitoring":"Process",
+  "Need process discovery & optimization":"Process","Need knowledge discovery / business Q&A":"Technology",
+  "Need direct-to-client insights platform":"Process","Need rapid deployment without CTI":"Technology"
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let currentStep = 0;
+const weights = { objective:20, problem:20, deploy:10, automation:25, cx:15, ops:10 };
+const selections = {
+  objective: "CX Transformation", problem: "Virtual assistants / self-service",
+  deploy: "3-4 weeks", automation: "60-79% automated",
+  cx: "15-24% CSAT / 30-49% faster", ops: "25-39% efficiency gain"
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  STEP NAV
+// ══════════════════════════════════════════════════════════════════════════════
+const STEP_LABELS = ["Overview","Configure","Results"];
+function goTo(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  document.querySelectorAll('.step-pill').forEach((p,i) => {
+    p.classList.remove('active','done');
+    if (i === n) p.classList.add('active');
+    else if (i < n) p.classList.add('done');
+  });
+  ['nd-0','nd-1','nd-2'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i === n) el.classList.add('active');
+    else if (i < n) el.classList.add('done');
+  });
+  document.getElementById('step-context').textContent = `Step ${n+1} of 3 — ${STEP_LABELS[n]}`;
+  document.getElementById('btn-prev').style.display = n > 0 ? '' : 'none';
+  document.getElementById('btn-next').textContent = n === 0 ? 'Start →' : n === 1 ? 'Run analysis →' : 'Done';
+  currentStep = n;
+  renderSelSummary();
+}
+function nextStep() {
+  if (currentStep === 0) goTo(1);
+  else if (currentStep === 1) runAndShow();
+  else goTo(0);
+}
+function prevStep() { if (currentStep > 0) goTo(currentStep - 1); }
+function runAndShow() { runEngine(); goTo(2); }
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SIDEBAR SUMMARY
+// ══════════════════════════════════════════════════════════════════════════════
+const SEL_DEFS = [
+  { key:'objective',  label:'Objective',           hasLens:true,  scoreFn: ()=>null },
+  { key:'problem',    label:'Customer Problem',     hasLens:true,  scoreFn: ()=>null },
+  { key:'deploy',     label:'Deployment Timeline',  hasLens:false, scoreFn: v => DEPLOY_SCORES[v] },
+  { key:'automation', label:'Automation Coverage',  hasLens:false, scoreFn: v => AUTO_SCORES[v] },
+  { key:'cx',         label:'CX Improvement',       hasLens:false, scoreFn: v => CX_SCORES[v] },
+  { key:'ops',        label:'Ops Efficiency Gain',  hasLens:false, scoreFn: v => OPS_SCORES[v] },
+];
+
+function renderSelSummary() {
+  const container = document.getElementById('sel-summary');
+  if (!container) return;
+  const isOverview = currentStep === 0;
+  container.innerHTML = SEL_DEFS.map(def => {
+    const val = selections[def.key];
+    const score = def.scoreFn(val);
+    const lens = def.key === 'objective' ? OBJ_LENS[val] : def.key === 'problem' ? PROB_LENS[val] : null;
+    const lensHtml = lens ? `<span class="sel-lens-tag ${lensClass(lens)}">${lens}</span>` : '';
+    const scoreHtml = score ? `<span class="sel-score-tag">${score}/5</span>` : '';
+    const clickAttr = isOverview ? '' : `onclick="goTo(1)" title="Click to edit"`;
+    const cursorStyle = isOverview ? 'cursor:default;' : '';
+    return `
+      <div class="sel-item" style="${cursorStyle}" ${clickAttr}>
+        <div class="sel-item-label">
+          <span>${def.label}</span>
+          ${!isOverview ? '<span class="edit-hint">edit ›</span>' : ''}
+        </div>
+        <div class="sel-item-val">${val}</div>
+        <div class="sel-item-meta">${lensHtml}${scoreHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+function syncFromSelect(param) {
+  const val = document.getElementById('cfg-' + param).value;
+  selections[param] = val;
+  updateLens(); updateScoreBoxes(); renderSelSummary();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  LENS LABELS
+// ══════════════════════════════════════════════════════════════════════════════
+function lensClass(lens) {
+  return lens === 'People' ? 'lens-people' : lens === 'Process' ? 'lens-process' : 'lens-technology';
+}
+function updateLens() {
+  const oLens = OBJ_LENS[selections.objective] || 'Technology';
+  const pLens = PROB_LENS[selections.problem] || 'Technology';
+  const objEl = document.getElementById('pr-lens-obj');
+  if (objEl) { objEl.textContent = oLens; objEl.className = 'pr-lens-tag ' + lensClass(oLens); }
+  const probEl = document.getElementById('pr-lens-prob');
+  if (probEl) { probEl.textContent = pLens; probEl.className = 'pr-lens-tag ' + lensClass(pLens); }
+  renderSelSummary();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SCORE BOXES (live preview)
+// ══════════════════════════════════════════════════════════════════════════════
+function updateScoreBoxes() {
+  selections.deploy = document.getElementById('cfg-deploy').value;
+  selections.automation = document.getElementById('cfg-automation').value;
+  selections.cx = document.getElementById('cfg-cx').value;
+  selections.ops = document.getElementById('cfg-ops').value;
+  selections.objective = document.getElementById('cfg-objective').value;
+  selections.problem = document.getElementById('cfg-problem').value;
+  document.getElementById('ps-deploy').textContent = DEPLOY_SCORES[selections.deploy] || '—';
+  document.getElementById('ps-auto').textContent = AUTO_SCORES[selections.automation] || '—';
+  document.getElementById('ps-cx').textContent = CX_SCORES[selections.cx] || '—';
+  document.getElementById('ps-ops').textContent = OPS_SCORES[selections.ops] || '—';
+  updateLens();
+  renderSelSummary();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  WEIGHTS
+// ══════════════════════════════════════════════════════════════════════════════
+let donutChart = null;
+const DONUT_COLORS = ['#1a56db','#0f6e56','#534ab7','#854f0b','#a32d2d','#3d3c39'];
+const WEIGHT_KEYS = ['objective','problem','deploy','automation','cx','ops'];
+const WEIGHT_LABELS = ['Objective','Problem','Deploy','Automation','CX','Ops'];
+
+function syncWeight(key, val) {
+  weights[key] = parseInt(val);
+  document.getElementById('wv-' + key).textContent = val + '%';
+  const total = Object.values(weights).reduce((a,b) => a+b, 0);
+  const tv = document.getElementById('total-val');
+  if (total === 100) { tv.textContent = '100% ✓'; tv.className = 'total-ok'; }
+  else { tv.textContent = total + '% ✗'; tv.className = 'total-err'; }
+  updateDonut();
+}
+
+function updateDonut() {
+  const data = WEIGHT_KEYS.map(k => weights[k]);
+  if (!donutChart) return;
+  donutChart.data.datasets[0].data = data;
+  donutChart.update();
+}
+
+function initDonut() {
+  const ctx = document.getElementById('donutChart');
+  if (!ctx) return;
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: WEIGHT_LABELS,
+      datasets: [{ data: WEIGHT_KEYS.map(k => weights[k]), backgroundColor: DONUT_COLORS, borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      responsive: false,
+      cutout: '65%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
+          }
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  ENGINE
+// ══════════════════════════════════════════════════════════════════════════════
+function getLens(t, lens) {
+  return lens === 'People' ? t.people : lens === 'Process' ? t.process : t.tech;
+}
+
+function compute() {
+  const oIdx = OBJ_KEYS.indexOf(selections.objective);
+  const pIdx = PROB_KEYS.indexOf(selections.problem);
+  const oLens = OBJ_LENS[selections.objective] || 'Technology';
+  const pLens = PROB_LENS[selections.problem] || 'Technology';
+  const wObj  = weights.objective / 100;
+  const wProb = weights.problem / 100;
+  const wDep  = weights.deploy / 100;
+  const wAuto = weights.automation / 100;
+  const wCX   = weights.cx / 100;
+  const wOps  = weights.ops / 100;
+
+  return TOOLS.map(t => {
+    const oBase = (oIdx >= 0 && OBJ_MATRIX[t.name]) ? OBJ_MATRIX[t.name][oIdx] : 3;
+    const pBase = (pIdx >= 0 && PROB_MATRIX[t.name]) ? PROB_MATRIX[t.name][pIdx] : 3;
+    const adjO = oBase * 0.75 + getLens(t, oLens) * 0.25;
+    const adjP = pBase * 0.75 + getLens(t, pLens) * 0.25;
+    const raw = adjO*wObj + adjP*wProb + t.deploy*wDep + t.auto*wAuto + t.cx*wCX + t.ops*wOps;
+    return { ...t, score: Math.round(raw * 20 * 10) / 10,
+      sc: { obj: Math.round(adjO*10)/10, prob: Math.round(adjP*10)/10, deploy: t.deploy, auto: t.auto, cx: t.cx, ops: t.ops } };
+  }).sort((a,b) => b.score - a.score).map((t,i) => ({ ...t, rank: i+1 }));
+}
+
+function getTier(s) {
+  if (s >= 90) return { label:'Best Fit', cls:'tier-best' };
+  if (s >= 75) return { label:'Good Fit', cls:'tier-good' };
+  if (s >= 60) return { label:'Conditional Fit', cls:'tier-cond' };
+  return { label:'Low Fit', cls:'tier-low' };
+}
+function scoreColor(s) {
+  if (s >= 90) return 'var(--green)';
+  if (s >= 75) return 'var(--accent)';
+  if (s >= 60) return 'var(--amber)';
+  return 'var(--red)';
+}
+function getCue(rank, score) {
+  if (rank === 1) return { label:'Top pick', cls:'cue-top' };
+  if (rank === 2) return { label:'Runner-up', cls:'cue-run' };
+  if (score >= 75) return { label:'Qualified', cls:'cue-qual' };
+  return { label:'Review', cls:'cue-rev' };
+}
+function stars(v) {
+  let s = '';
+  for (let i=0; i<5; i++) s += `<span style="color:${i<Math.round(v)?'var(--accent)':'var(--border2)'}">★</span>`;
+  return s;
+}
+
+function runEngine() {
+  const ranked = compute();
+  const top = ranked[0], runner = ranked[1];
+  const tier = getTier(top.score);
+  const gap = Math.round((top.score - runner.score) * 10) / 10;
+
+  // Winner
+  document.getElementById('r-name').textContent = top.name;
+  document.getElementById('r-score').textContent = top.score;
+  document.getElementById('r-score').style.color = '#fbbf24';
+  document.getElementById('r-tier').innerHTML = `<span class="tier-tag ${tier.cls}">${tier.label}</span>`;
+  document.getElementById('r-cap').textContent = top.primary;
+  document.getElementById('r-use').textContent = 'Best for: ' + top.use;
+  document.getElementById('r-runner-name').textContent = runner.name;
+  document.getElementById('r-gap').textContent = `+${gap} pts lead`;
+  document.getElementById('r-why').innerHTML = `Recommend <strong>${top.name}</strong> because it best matches <em>${selections.objective}</em> and <em>${selections.problem}</em>. The recommendation reflects ${top.score}/100 lens-adjusted fit and a ${gap}-point lead over ${runner.name}.`;
+
+  // Comparison
+  const cmpHtml = [
+    { t: top, cls: 'is-win', tag: '🥇 Top pick', dotCol: 'var(--green)', scoreCls: 'win', barCls: 'win' },
+    { t: runner, cls: '', tag: '🥈 Runner-up', dotCol: 'var(--amber)', scoreCls: 'run', barCls: 'run' }
+  ].map(({ t, cls, tag, dotCol, scoreCls, barCls }) => `
+    <div class="cmp-card ${cls}">
+      <div class="cmp-badge"><span class="cmp-badge-dot" style="background:${dotCol}"></span>${tag}</div>
+      <div class="cmp-header">
+        <div><div class="cmp-name">${t.name}</div><div class="cmp-cat">${t.cat}</div></div>
+        <div class="cmp-score ${scoreCls}">${t.score}</div>
+      </div>
+      ${['deploy','auto','cx','ops'].map((k,i) => {
+        const labels = ['Deploy','Automation','CX Impact','Ops Gain'];
+        const val = k === 'auto' ? t.sc.auto : k === 'deploy' ? t.sc.deploy : k === 'cx' ? t.sc.cx : t.sc.ops;
+        return `<div class="metric-row">
+          <div class="metric-top"><span class="metric-name">${labels[i]}</span><span class="metric-stars">${stars(val)}</span></div>
+          <div class="metric-bar-bg"><div class="metric-bar-fill ${barCls}" style="width:${val/5*100}%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+  document.getElementById('compare-body').innerHTML = cmpHtml;
+
+  // Leaderboard
+  const lbHtml = ranked.map(t => {
+    const cue = getCue(t.rank, t.score);
+    const rankCls = t.rank === 1 ? 'r1' : t.rank === 2 ? 'r2' : t.rank === 3 ? 'r3' : 'rn';
+    const itemCls = t.rank <= 3 ? `rank-${t.rank}` : '';
+    return `<div class="lb-item ${itemCls}">
+      <div class="lb-rank ${rankCls}">${t.rank}</div>
+      <div><div class="lb-name">${t.name}</div><div class="lb-cat">${t.cat}</div></div>
+      <div class="lb-bar-wrap">
+        <div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${t.score}%;background:${scoreColor(t.score)}"></div></div>
+      </div>
+      <div class="lb-score" style="color:${scoreColor(t.score)}">${t.score}</div>
+      <div class="lb-cue ${cue.cls}">${cue.label}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('lb-body').innerHTML = lbHtml;
+
+  // Accordion
+  const accHtml = ranked.map(t => `
+    <div class="accordion-item">
+      <button class="accordion-trigger" onclick="toggleAcc(this)">
+        <span>${t.rank}. ${t.name} <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${scoreColor(t.score)};margin-left:8px;">${t.score}</span></span>
+        <span class="acc-arrow">›</span>
+      </button>
+      <div class="accordion-content">
+        <div class="tool-detail">
+          <strong>Capability:</strong> ${t.primary}<br>
+          <strong>Best for:</strong> ${t.use}<br>
+          <strong>Category:</strong> ${t.cat} · <strong>Availability:</strong> ${t.avail}
+          <div class="lens-scores">
+            <span class="ls-pill" style="background:var(--purple-light);color:var(--purple)">People ${t.people}/5</span>
+            <span class="ls-pill" style="background:var(--accent-light);color:var(--accent)">Process ${t.process}/5</span>
+            <span class="ls-pill" style="background:var(--teal-light);color:var(--teal)">Tech ${t.tech}/5</span>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('acc-body').innerHTML = accHtml;
+}
+
+function toggleAcc(btn) {
+  const content = btn.nextElementSibling;
+  const isOpen = content.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  content.classList.toggle('open', !isOpen);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  HOME MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+function openHomeModal() {
+  document.getElementById('homeModal').classList.add('show');
+}
+function closeHomeModal() {
+  document.getElementById('homeModal').classList.remove('show');
+}
+function goHome() {
+  closeHomeModal();
+  // Home navigation logic to be provided later
+}
+// Close on overlay click
+document.getElementById('homeModal').addEventListener('click', function(e) {
+  if (e.target === this) closeHomeModal();
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════════════════
+updateLens();
+updateScoreBoxes();
+renderSelSummary();
+setTimeout(initDonut, 200);
+</script>
+</body>
+</html>
